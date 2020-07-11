@@ -1,0 +1,176 @@
+//Motor1
+int en1=11;
+int in3=8;
+int in4=9;
+
+//Motor2
+int en2=10;
+int in1=7;
+int in2=6;
+
+//speed control
+int pot= A0;
+int val=0;
+
+//buttons
+int left = 5;
+int forward = 4;
+int reverse = 3;
+int right = 2;
+
+//UltraSonic sensor
+int cm = 0;
+
+long readUltrasonicDistance(int triggerPin1, int echoPin1)
+
+{
+  pinMode(triggerPin1, OUTPUT);  
+  digitalWrite(triggerPin1, LOW);
+  delayMicroseconds(2);
+  digitalWrite(triggerPin1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin1, LOW);
+  pinMode(echoPin1, INPUT);
+  return pulseIn(echoPin1, HIGH);
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void setup(){
+  
+  Serial.begin(9600);
+  pinMode (en1,OUTPUT);
+  pinMode (en2,OUTPUT);
+  pinMode (in1,OUTPUT);
+  pinMode (in2,OUTPUT);
+  pinMode (in3,OUTPUT);
+  pinMode (in4,OUTPUT);
+  pinMode (left,INPUT);
+  pinMode (forward,INPUT);
+  pinMode (reverse,INPUT);
+  pinMode (right,INPUT);
+  delay(100);
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void loop (){
+  
+  //Read direction
+  int leftState = digitalRead(left);
+  int forwardState = digitalRead(forward);
+  int reverseState = digitalRead(reverse);
+  int rightState = digitalRead(right);
+  
+  cm = 0.01723 * readUltrasonicDistance(12, 12);
+    delay(100);
+  
+  /*
+  By switching the direction of the two motors either both have
+  the same direction which will result in a forward or backwards
+  movement or different direction which will result in a right
+  or left movement.
+  */
+  
+  if (leftState == 0 ){
+    
+    Serial.println("left");
+  //Motor1
+  digitalWrite(in4,HIGH);
+  digitalWrite(in3,LOW);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en1,val);
+  
+  //Motor2
+  digitalWrite(in1,HIGH);
+  digitalWrite(in2,LOW);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en2,val);
+    delay(100);
+    
+  }
+  
+  else if (forwardState == 0 ){
+    
+    Serial.println("forward");
+  //Motor1
+  digitalWrite(in4,LOW);
+  digitalWrite(in3,HIGH);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en1,val);
+  
+  //Motor2
+  digitalWrite(in1,HIGH);
+  digitalWrite(in2,LOW);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en2,val);
+    delay(100);
+    
+  }
+           
+  else if (reverseState == 0 ){
+    
+    Serial.println("reverse");
+  //Motor1
+  digitalWrite(in4,HIGH);
+  digitalWrite(in3,LOW);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en1,val);
+  
+  //Motor2
+  digitalWrite(in1,LOW);
+  digitalWrite(in2,HIGH);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en2,val);
+    delay(100);
+    
+  }
+           
+  else if (rightState == 0 ){
+    
+    Serial.println("right");
+  //Motor1
+  digitalWrite(in4,LOW);
+  digitalWrite(in3,HIGH);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en1,val);
+  
+  //Motor2
+  digitalWrite(in1,LOW);
+  digitalWrite(in2,HIGH);
+  val =analogRead(pot);
+  val = map(val, 0, 1023, 0, 255); //speed range
+  analogWrite(en2,val);
+    delay(100);
+    
+  }     
+  
+  /* 
+  If the robot detects an object less than 50cm away
+  it will stop 
+  */
+  
+  if (cm < 50 ){
+    
+   Serial.println("Object detected");
+    //Motor1
+  digitalWrite(in4,LOW);
+  digitalWrite(in3,LOW);
+  
+  //Motor2
+  digitalWrite(in1,LOW);
+  digitalWrite(in2,LOW);
+    delay(100);
+    
+  }
+    delay(100);
+} 
+
+//https://www.tinkercad.com/things/2amX7rvqA88
